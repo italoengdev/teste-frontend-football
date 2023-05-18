@@ -8,6 +8,7 @@ interface ParametersPageProps {
 interface Country {
   name: string;
   code: string;
+  flag: string;
 }
 
 const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
@@ -45,20 +46,17 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
 
   return (
     <div>
-      <h2>Account:</h2>
-      {/* Account details */}
-
       <h2>Select Country:</h2>
       <div>
         <select
-          className="form-select"
+          className="form-select bg-light"
           onChange={handleCountryChange}
           value={selectedCountry?.code || ''}
         >
-          <option value="">Select a country</option>
+          <option className='bg-light' value="">Select a country</option>
           {countries.map((country) => (
-            <option key={country.code} value={country.code}>
-              {country.name}
+            <option className='bg-light' key={country.code} value={country.code}>
+          {country.name}
             </option>
           ))}
         </select>
@@ -70,6 +68,7 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
           <div>
             <p>Name: {selectedCountry.name}</p>
             <p>Code: {selectedCountry.code}</p>
+            <img src={selectedCountry.flag} alt="Country Flag" />
           </div>
         </div>
       )}
