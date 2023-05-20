@@ -23,15 +23,17 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
   const [leagues, setLeagues] = useState<League[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<any[]>([]); // Add teams state variable
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+
 
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await axios.get('https://v3.football.api-sports.io/countries', {
+        const response = await axios.get('https://v1.baseball.api-sports.io/countries', {
           headers: {
             'x-rapidapi-key': apiKey,
-            'x-rapidapi-host': 'v3.football.api-sports.io',
+            'x-rapidapi-host': 'v1.baseball.api-sports.io',
           },
         });
         setCountries(response.data.response);
@@ -48,22 +50,23 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
       try {
         if (selectedCountry) {
           const response = await axios.get(
-            `https://v3.football.api-sports.io/leagues?country=${selectedCountry.name}`,
+            `https://v1.baseball.api-sports.io/leagues?country=${selectedCountry.name}`,
             {
               headers: {
                 'x-rapidapi-key': apiKey,
-                'x-rapidapi-host': 'v3.football.api-sports.io',
+                'x-rapidapi-host': 'v1.baseball.api-sports.io',
               },
             }
           );
           console.log(response.data.response);
           const extractedLeagues = response.data.response.map((item: any) => ({
-            name: item.league.name,
-            seasons: item.seasons.map((season: any) => season.year),
-            id: item.league.id,
+            name: item.name,
+            seasons: item.seasons.map((season: { season: any; }) => season.season),
+            id: item.id,
           }));
             setLeagues(extractedLeagues);
             console.log(extractedLeagues);
+            console.log(extractedLeagues.seasons.s);
            
           
         }
@@ -80,19 +83,20 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
     const fetchTeams = async () => {
       try {
         if (selectedLeague && selectedSeason) {
-          const leagueName = selectedLeague.name;
+          const leagueName = selectedLeague.id;
           const countryName = selectedCountry!.name;
 
           const response = await axios.get(
-            `https://v3.football.api-sports.io/teams?name=${leagueName}&country=${countryName}&season=${selectedSeason}`,
+            `https://v1.baseball.api-sports.io/teams?league=${leagueName}&country=${countryName}&season=${selectedSeason}`,
             {
               headers: {
                 'x-rapidapi-key': apiKey,
-                'x-rapidapi-host': 'v3.football.api-sports.io',
+                'x-rapidapi-host': 'v1.baseball.api-sports.io',
               },
             }
           );
-
+          console.log(response);
+          console.log(response.data.response);
           setTeams(response.data.response);
         }
       } catch (error) {
@@ -108,12 +112,16 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
     const selected = countries.find((country) => country.code === countryCode);
     setSelectedCountry(selected || null);
     setSelectedLeague(null);
+    setSelectedTeam(null);
+
   };
 
   const handleLeagueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const leagueId = parseInt(event.target.value);
     const selected = leagues.find((league) => league.id === leagueId);
     setSelectedLeague(selected || null);
+    setSelectedTeam(null);
+
   };
 
   const handleSeasonChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -122,20 +130,25 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
     setTeams([]);
   };
 
+  const handleTeamChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const teamId = event.target.value;
+    setSelectedTeam(teamId);
+  };
+  
+
   return (
-    <div>
+    <div className="container">
+      <h1>Welcome to My Team Statistics</h1>
       <h2>Select Country:</h2>
-      <div>
+      <div className="form-group">
         <select
-          className="form-select bg-light"
+          className="form-control"
           onChange={handleCountryChange}
           value={selectedCountry?.code || ''}
         >
-          <option className="bg-light" value="">
-            Select a country
-          </option>
+          <option value="">Select a country</option>
           {countries.map((country) => (
-            <option className="bg-light" key={country.code} value={country.code}>
+            <option key={country.code} value={country.code}>
               {country.name}
             </option>
           ))}
@@ -145,17 +158,15 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
       {selectedCountry && (
         <div>
           <h2>Select a League:</h2>
-          <div>
+          <div className="form-group">
             <select
-              className="form-select bg-light"
+              className="form-control"
               onChange={handleLeagueChange}
               value={selectedLeague?.id || ''}
             >
-              <option className="bg-light" value="">
-                Select a league
-              </option>
+              <option value="">Select a league</option>
               {leagues.map((league) => (
-                <option className="bg-light" key={league.id} value={league.id}>
+                <option key={league.id} value={league.id}>
                   {league.name}
                 </option>
               ))}
@@ -167,17 +178,15 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
       {selectedCountry && selectedLeague && (
         <div>
           <h2>Select a Season:</h2>
-          <div>
+          <div className="form-group">
             <select
-              className="form-select bg-light"
+              className="form-control"
               onChange={handleSeasonChange}
               value={selectedSeason || ''}
             >
-              <option className="bg-light" value="">
-                Select a season
-              </option>
+              <option value="">Select a season</option>
               {selectedLeague.seasons.map((season: any) => (
-                <option className="bg-light" key={season} value={season}>
+                <option key={season} value={season}>
                   {season}
                 </option>
               ))}
@@ -186,26 +195,24 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
         </div>
       )}
 
-      {selectedCountry && selectedLeague && selectedSeason && (
+      {teams.length > 0 && selectedCountry && selectedLeague && selectedSeason && (
         <div>
-          <h2>Selected League:</h2>
-          <div>
-            <p>Name: {selectedLeague.name}</p>
+          
+          <div className="form-group">
+            <h2>Teams:</h2>
+            <select
+              className="form-control"
+              onChange={handleTeamChange}
+              value={selectedTeam || ''}
+            >
+              <option value="">Select a team</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
           </div>
-          <h2>Selected Season:</h2>
-          <div>
-            <p>Year: {selectedSeason}</p>
-          </div>
-          {teams.length > 0 && (
-            <div>
-              <h2>Teams:</h2>
-              <ul>
-                {teams.map((team) => (
-                  <li key={team.team.id}>{team.team.name}</li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       )}
     </div>
