@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import ParametersPage from './ParametersPage';
+import ParametersPage from './ParametersTeam';
 import 'bootstrap/dist/css/bootstrap.css';
 
 const LoginPage: React.FC = () => {
