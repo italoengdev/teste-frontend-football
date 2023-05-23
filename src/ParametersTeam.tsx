@@ -17,6 +17,12 @@ interface League {
   season: number;
 }
 
+interface Player {
+  name: string;
+  age: number;
+  nationality: string;
+}
+
 const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
@@ -24,16 +30,17 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [teams, setTeams] = useState<any[]>([]); // Add teams state variable
-  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
 
 
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await axios.get('https://v1.baseball.api-sports.io/countries', {
+        const response = await axios.get('https://v3.football.api-sports.io/countries', {
           headers: {
             'x-rapidapi-key': apiKey,
-            'x-rapidapi-host': 'v1.baseball.api-sports.io',
+            'x-rapidapi-host': 'v3.football.api-sports.io',
           },
         });
         setCountries(response.data.response);
@@ -50,11 +57,11 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
       try {
         if (selectedCountry) {
           const response = await axios.get(
-            `https://v1.baseball.api-sports.io/leagues?country=${selectedCountry.name}`,
+            `https://v3.football.api-sports.io/leagues?country=${selectedCountry.name}`,
             {
               headers: {
                 'x-rapidapi-key': apiKey,
-                'x-rapidapi-host': 'v1.baseball.api-sports.io',
+                'x-rapidapi-host': 'v3.football.api-sports.io',
               },
             }
           );
@@ -87,11 +94,11 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
           const countryName = selectedCountry!.name;
 
           const response = await axios.get(
-            `https://v1.baseball.api-sports.io/teams?league=${leagueName}&country=${countryName}&season=${selectedSeason}`,
+            `https://v3.football.api-sports.io/teams?league=${leagueName}&country=${countryName}&season=${selectedSeason}`,
             {
               headers: {
                 'x-rapidapi-key': apiKey,
-                'x-rapidapi-host': 'v1.baseball.api-sports.io',
+                'x-rapidapi-host': 'v3.football.api-sports.io',
               },
             }
           );
@@ -106,6 +113,38 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
 
     fetchTeams();
   }, [apiKey, selectedLeague, selectedCountry, selectedSeason]);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        if (selectedTeam && selectedSeason) {
+          const response = await axios.get(
+            'https://v3.football.api-sports.io/players',
+            {
+              headers: {
+                'x-rapidapi-key': apiKey,
+                'x-rapidapi-host': 'v3.football.api-sports.io',
+              },
+              params: {
+                team: selectedTeam,
+                season: selectedSeason,
+              },
+            }
+          );
+          const extractedPlayers = response.data.response.map((player: any) => ({
+            name: player.player.name,
+            age: player.player.age,
+            nationality: player.player.nationality,
+          }));
+          setPlayers(extractedPlayers);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPlayers();
+  }, [apiKey, selectedTeam, selectedSeason]);
 
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const countryCode = event.target.value;
@@ -130,9 +169,11 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
     setTeams([]);
   };
 
+
   const handleTeamChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const teamId = event.target.value;
-    setSelectedTeam(teamId);
+    const teamId = parseInt(event.target.value);
+    const selected = teams.find((team) => team.id === teamId);
+    setSelectedTeam(selected || null);
   };
   
 
@@ -213,6 +254,24 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
               ))}
             </select>
           </div>
+        </div>
+      )}
+
+
+{teams.length > 0 && selectedCountry && selectedLeague && selectedSeason && selectedTeam && (
+        <div>
+          <h2>Selected Team:</h2>
+          <div>
+            <p>Name: {selectedTeam}</p>
+          </div>
+          <h2>Selected Team's Players:</h2>
+          <ul>
+            {players.map((player) => (
+              <li key={player.name}>
+                Name: {player.name}, Age: {player.age}, Nationality: {player.nationality}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

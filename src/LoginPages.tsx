@@ -15,10 +15,10 @@ const LoginPage: React.FC = () => {
       // Perform validation and API key check here
       const config = {
         method: 'get',
-        url: 'https://v3.football.api-sports.io/status',
+        url: 'https://api-football-v1.p.rapidapi.com/v3/timezone',
         headers: {
           'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'v3.football.api-sports.io',
+          'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
         },
       };
 
