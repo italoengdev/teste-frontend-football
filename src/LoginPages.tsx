@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import ParametersPage from './ParametersTeam';
 import 'bootstrap/dist/css/bootstrap.css';
+import './index.css';
 
 const LoginPage: React.FC = () => {
   const [apiKey, setApiKey] = useState('');
@@ -59,12 +60,12 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="container py-5">
+    <div className="container py-5 mt-5">
       <div className="row justify-content-center">
         <div className="col-lg-4">
           <div className="card shadow">
             <div className="card-body">
-              <h3 className="card-title text-center">Football Login</h3>
+              <h3 className="card-title text-center">Football Statistics Login</h3>
               <input
                 type="text"
                 className="form-control mb-3"
@@ -87,12 +88,22 @@ const LoginPage: React.FC = () => {
               {isLoggedIn && !showWelcomePopup && !error && (
                 <div className="alert alert-info mt-3">Loading...</div>
               )}
+              <div className="mt-3 text-center">
+                <p>
+                  Don't have an API key yet? Register on{' '}
+                  <a href="https://dashboard.api-football.com/register" target="_blank" rel="noopener noreferrer">
+                    https://dashboard.api-football.com/register
+                  </a>{' '}
+                  to get your API key.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default LoginPage;

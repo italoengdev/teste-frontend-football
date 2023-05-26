@@ -262,7 +262,7 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
   
 
   return (
-    <div className="container bg-success">
+    <div className="container bg-info">
   <h1 className="mt-5">Welcome to My Team Statistics</h1>
   <div className="row mt-4">
     <div className="col-md-6">
@@ -400,7 +400,7 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
             </ul>
           </div>
 
-          <div className="col-md-6 bg-light">
+          <div className="col-md-6 bg-light pb-5 mb-3">
             <div style={{ width: '400px', height: '400px' }}>
               <h2>Number of Goals Scored per Game Time:</h2>
               <VictoryPie data={data} colorScale="qualitative" />
