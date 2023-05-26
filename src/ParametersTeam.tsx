@@ -262,151 +262,156 @@ const ParametersPage: React.FC<ParametersPageProps> = ({ apiKey }) => {
   
 
   return (
-    <div className="container">
-      <h1 className="mt-5">Welcome to My Team Statistics</h1>
-      <div className="row mt-4">
+    <div className="container bg-success">
+  <h1 className="mt-5">Welcome to My Team Statistics</h1>
+  <div className="row mt-4">
+    <div className="col-md-6">
+      <h2>Select Country:</h2>
+      <div className="form-group">
+        <select
+          className="form-control"
+          onChange={handleCountryChange}
+          value={selectedCountry?.code || ''}
+        >
+          <option value="">Select a country</option>
+          {countries.map((country) => (
+            <option key={country.code} value={country.code}>
+              {country.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    {selectedCountry && (
+      <div className="col-md-6">
+        <h2>Select a League:</h2>
+        <div className="form-group">
+          <select
+            className="form-control"
+            onChange={handleLeagueChange}
+            value={selectedLeague?.id || ''}
+          >
+            <option value="">Select a league</option>
+            {leagues.map((league) => (
+              <option key={league.id} value={league.id}>
+                {league.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    )}
+  </div>
+
+  {selectedCountry && selectedLeague && (
+    <div className="row mt-4">
+      <div className="col-md-6">
+        <h2>Select a Season:</h2>
+        <div className="form-group">
+          <select
+            className="form-control"
+            onChange={handleSeasonChange}
+            value={selectedSeason || ''}
+          >
+            <option value="">Select a season</option>
+            {selectedLeague.seasons.map((season: any) => (
+              <option key={season} value={season}>
+                {season}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {teams.length > 0 && (
         <div className="col-md-6">
-          <h2>Select Country:</h2>
+          <h2>Select a Team:</h2>
           <div className="form-group">
             <select
               className="form-control"
-              onChange={handleCountryChange}
-              value={selectedCountry?.code || ''}
+              onChange={handleTeamChange}
+              value={selectedTeam || ''}
             >
-              <option value="">Select a country</option>
-              {countries.map((country) => (
-                <option key={country.code} value={country.code}>
-                  {country.name}
+              <option value="">Select a team</option>
+              {teams.map((team) => (
+                <option key={team.team.id} value={team.team.id}>
+                  {team.team.name}
                 </option>
               ))}
             </select>
           </div>
         </div>
-
-        {selectedCountry && (
-          <div className="col-md-6">
-            <h2>Select a League:</h2>
-            <div className="form-group">
-              <select
-                className="form-control"
-                onChange={handleLeagueChange}
-                value={selectedLeague?.id || ''}
-              >
-                <option value="">Select a league</option>
-                {leagues.map((league) => (
-                  <option key={league.id} value={league.id}>
-                    {league.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        )}
-     
-
-      {selectedCountry && selectedLeague && (
-        <div className="row mt-4">
-          <div className="col-md-6">
-            <h2>Select a Season:</h2>
-            <div className="form-group">
-              <select
-                className="form-control"
-                onChange={handleSeasonChange}
-                value={selectedSeason || ''}
-              >
-                <option value="">Select a season</option>
-                {selectedLeague.seasons.map((season: any) => (
-                  <option key={season} value={season}>
-                    {season}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {teams.length > 0 && (
-            <div className="col-md-6">
-              <h2>Select a Team:</h2>
-              <div className="form-group">
-                <select
-                  className="form-control"
-                  onChange={handleTeamChange}
-                  value={selectedTeam || ''}
-                >
-                  <option value="">Select a team</option>
-                  {teams.map((team) => (
-                    <option key={team.team.id} value={team.team.id}>
-                      {team.team.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
-        </div>
       )}
- </div>
-      {teams.length > 0 && selectedCountry && selectedLeague && selectedSeason && selectedTeam && (
-        <div className="mt-4 container">
-          <div className='col-md-6'>
+    </div>
+  )}
+
+  {teams.length > 0 && selectedCountry && selectedLeague && selectedSeason && selectedTeam && (
+    <div className="mt-4 container">
+      <div className="row">
+        <div className="col-md-6">
           <h2>Selected Team's Players:</h2>
           <ul className="list-group">
             {players.map((player) => (
               <li className="list-group-item" key={player.name}>
-                <strong>Name:</strong> {player.name}, <strong>Age:</strong> {player.age}, <strong>Nationality:</strong> {player.nationality}
+                <strong>Name:</strong> {player.name}, <strong>Age:</strong> {player.age},{' '}
+                <strong>Nationality:</strong> {player.nationality}
               </li>
             ))}
           </ul>
         </div>
+
         {lineups.length > 0 ? (
-  <div className="col-md-6">
-    <h2>Selected Team's Lineups:</h2>
-    <ul className="list-group">
-      {lineups.map((lineup) => (
-        <li className="list-group-item" key={lineup.formation}>
-          <strong>Formation:</strong> {lineup.formation}, <strong>Played:</strong> {lineup.played}
-        </li>
-      ))}
-    </ul>
-  </div>
-) : (
-  <div className="col-md-6">
-    <p>No lineup information available for this team in the current season.</p>
-  </div>
-)}
-{played && wins && loses && draws &&  (
-  <div className='container'>
-  <div className="col-md-6">
-    <h2>Fixtures Summary:</h2>
-    <ul className="list-group">
-    
-        <li className="list-group-item" key={played.total}>
-          <strong>total of matches:</strong> {played.total}
-        </li>
-        <li className="list-group-item" key={wins.total}>
-          <strong>total of wins:</strong> {wins.total}
-        </li>
-        <li className="list-group-item" key={loses.total}>
-          <strong>total of loses:</strong> {loses.total}
-        </li>
-        <li className="list-group-item" key={draws.total}>
-          <strong>total of draws:</strong> {draws.total}
-        </li>
-        
-    </ul>
-    <div style={{ width: '400px', height: '400px' }}>
-          <h1>Number of Goals Scored per Game Time:</h1>
+          <div className="col-md-6">
+            <h2>Selected Team's Lineups:</h2>
+            <ul className="list-group">
+              {lineups.map((lineup) => (
+                <li className="list-group-item" key={lineup.formation}>
+                  <strong>Formation:</strong> {lineup.formation}, <strong>Played:</strong>{' '}
+                  {lineup.played}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="col-md-6">
+            <p>No lineup information available for this team in the current season.</p>
+          </div>
+        )}
+      </div>
+
+      {played && wins && loses && draws && (
+        <div className="row mt-4">
+          <div className="col-md-6">
+            <h2>Fixtures Summary:</h2>
+            <ul className="list-group">
+              <li className="list-group-item" key={played.total}>
+                <strong>Total matches:</strong> {played.total}
+              </li>
+              <li className="list-group-item" key={wins.total}>
+                <strong>Total wins:</strong> {wins.total}
+              </li>
+              <li className="list-group-item" key={loses.total}>
+                <strong>Total loses:</strong> {loses.total}
+              </li>
+              <li className="list-group-item" key={draws.total}>
+                <strong>Total draws:</strong> {draws.total}
+              </li>
+            </ul>
+          </div>
+
+          <div className="col-md-6 bg-light">
+            <div style={{ width: '400px', height: '400px' }}>
+              <h2>Number of Goals Scored per Game Time:</h2>
               <VictoryPie data={data} colorScale="qualitative" />
             </div>
-  </div>
-  </div>
-)}
-
-
-
+          </div>
         </div>
       )}
     </div>
+  )}
+</div>
+
   );
 };
 
